@@ -66,9 +66,9 @@ def get_cushing_stocks(length: int=52) -> dict:
 
 def get_refinery_utilization(length: int=52) -> dict:
     """
-    Weekly refinery utilization rates in the US by PADD region. This measures how much of 
-    the country's refining capacity is being used. High utilization means more demand for 
-    crude oil and more supply of refined products like gasoline and diesel.
+    Weekly refinery utilization rates in the US by PADD region. We pull gross inputs (EPXXX2) 
+    rather than the self-reported utilization percentage because we want to compute our own
+    efficiency metric against nameplate capacity.
 
     Args:
         length (int): How many weekly periods to retrieve (default is 52 for one year).
@@ -77,16 +77,16 @@ def get_refinery_utilization(length: int=52) -> dict:
         dict: Raw JSON response as a python dictionary.
     """
     route = "petroleum/pnp/wiup"
-    facets = {"product": ["EPC0"], "duoarea": ["R10"]} # product code for crude oil, and location code for the whole US.
+    facets = {"product": ["EPXXX2"]} # product code for crude oil, and location code for the whole US.
     
     return get_series(route, facets, length)
 
 
 def get_crude_imports(length: int=52) -> dict:
     """
-    Weekly crude oil imports into the US by PADD region. This shows how much foreign crude oil 
-    is coming into the country. High imports can indicate strong demand or supply disruptions 
-    domestically. 
+    Weekly crude oil imports into the US Weekly crude oil imports by country of origin.
+    Different countries produce crude of different API gravity: Canadian heavy, Saudi medium, 
+    Nigerian light sweet. This feeds the feedstock quality match score.
 
     Args:
         length (int): How many weekly periods to retrieve (default is 52 for one year).
@@ -94,16 +94,18 @@ def get_crude_imports(length: int=52) -> dict:
     Returns:
         dict: Raw JSON response as a python dictionary.
     """
-    route="petroleum/move/imp/d/cur",
-    facets={"product": ["EPC0"]},    
-    return get_series(route, facets, length)
+    return get_series(
+        route="petroleum/move/wimpc",
+        facets={"product": ["EPC0"]},
+        length=length
+    )
 
 
 def get_crude_production(length: int=52) -> dict:
     """
-    Weekly crude oil production in the US by PADD region. This shows how much crude oil is being 
-    produced domestically. High production can indicate strong supply, while low production can 
-    indicate supply constraints.
+    Weekly US field production of crude oil. This shows how much crude oil is being 
+    produced domestically. High production can indicate strong supply, while low
+    production can indicate supply constraints.
 
     Args:
         length (int): How many weekly periods to retrieve (default is 52 for one year).
@@ -111,6 +113,7 @@ def get_crude_production(length: int=52) -> dict:
     Returns:
         dict: Raw JSON response as a python dictionary.
     """
-    route="petroleum/sum/sndw",    
-    facets={"duoarea": ["NUS"], "product": ["EPC0F"]},
-    return get_series(route, facets, length)
+    return get_series(
+        route="petroleum/sum/sndw",
+        facets={"duoarea": ["NUS"], "product": ["EPC0"], "process": ["FPF"]},        length=length
+    )

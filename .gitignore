@@ -1,0 +1,6 @@
+.env
+.venv/
+pipeline.duckdb
+__pycache__/
+*.pyc
+.DS_Store

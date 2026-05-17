@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+from typing import Optional
 
 # reads .env file and sets environment variables
 load_dotenv()
@@ -8,7 +9,7 @@ load_dotenv()
 EIA_base_url = "https://api.eia.gov/v2"
 api_key = os.getenv("EIA_API_KEY")
 
-def get_series(route: str, facets: dict = None, length: int = 52) -> dict:    
+def get_series(route: str, facets: Optional[dict] = None, length: int = 52) -> dict:    
     """
     Pull a time series from the EIA API based on the specified route and facets.
 
@@ -115,5 +116,6 @@ def get_crude_production(length: int=52) -> dict:
     """
     return get_series(
         route="petroleum/sum/sndw",
-        facets={"duoarea": ["NUS"], "product": ["EPC0"], "process": ["FPF"]},        length=length
+        facets={"duoarea": ["NUS"], "product": ["EPC0"], "process": ["FPF"]},
+        length=length
     )

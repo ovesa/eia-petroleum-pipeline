@@ -4,3 +4,5 @@ duckdb
 pandas
 apache-airflow
 dbt-duckdb
+pytest
+pytest-mock

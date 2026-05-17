@@ -1,0 +1,37 @@
+# This workflow runs every time you push to main or open a pull request.
+# It spins up a fresh Ubuntu machine, installs your dependencies,
+# and runs your full pytest suite. Green checkmark = all tests passed.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: clone your repo onto the fresh machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: install Python 3.12, matching your local environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Step 3: install everything in requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Step 4: run your test suite
+      # EIA_API_KEY is pulled from GitHub Secrets — it never appears
+      # in plain text in your repo or in the Actions logs
+      - name: Run tests
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: pytest tests/ -v
